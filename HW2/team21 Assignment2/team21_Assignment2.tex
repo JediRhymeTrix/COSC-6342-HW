@@ -1,0 +1,182 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[all]{xy}
+\usepackage{amsmath,amsthm,amssymb,color,latexsym}
+\usepackage{geometry}        
+\geometry{letterpaper}    
+\usepackage{graphicx}
+\usepackage{minted}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+
+\newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
+\SetCommentSty{mycommfont}
+
+\SetKwInput{KwInput}{Input}                % Set the Input
+\SetKwInput{KwOutput}{Output}              % set the Output
+\SetKw{KwRet}{return}
+\newtheorem{problem}{Problem}
+
+\newenvironment{solution}[1][\it{Solution}]{\textbf{#1: } }
+
+
+\begin{document}
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{COSC 6342 \\ \today}
+\chead{Assignment 2 \\ Decision Trees}
+\lhead{Machine Learning \\ \textit{Student Name: Vedant Vohra }}
+\rfoot{Page \thepage}
+\lfoot{University of Houston}
+
+\noindent Due Date: \textcolor{red}{Friday, October 28, 2022, 11:59 PM}
+\begin{abstract}
+    In this assignment, you will learn about linear regression and classification. The questions below can be answered with the help of the book. Show all calculations done step-by-step. In problem 3, you need not worry about being "mathematically" correct.
+    Please follow the same notation as in the book. You are allowed to work on teams of up to three people. If working as a team, every member of the team should submit the (same) report. All reports and supplemental material must be zipped as \texttt{team\#\_Assignment\#.zip} and uploaded on Blackboard.
+\end{abstract}
+
+\begin{problem}
+Suppose we produce ten bootstrapped samples from a data set containing red
+and green classes. We then apply a classification tree to each bootstrapped sample and, for a
+specific value of X, produce 10 estimates of P(Class is Red |X):
+0.1, 0.15, 0.2, 0.2, 0.55, 0.6, 0.6, 0.65, 0.7, 0.75.
+There are two common ways to combine these results together into a single class prediction. One is the majority vote approach. The second approach is to classify based on the
+average probability. In this example, what is the final classification under each of these two
+approaches?
+
+\end{problem}
+
+\begin{solution}
+
+\textbf{For the majority vote approach}:
+
+Based on a certain threshold considering p = 0.5, we classify the instances when less than 0.5(green) and when greater than 0.5 (Red). Here the listed probabilities belonging to set which contains the largest number of instances will be the assigned class:
+
+0.1, 0.15, 0.2, 0.2, 0.55, 0.6, 0.6, 0.65, 0.7, 0.75
+
+G  , G   , G  , G  , R   , R  , R  , R   , R  , R
+
+No. of votes for class GREEN - 4 
+
+No. of votes for class RED - 6
+
+\textbf{\textit{Therefore, the assigned class based on the majority approach is RED}}.
+
+
+\textbf{For the average probability approach}:
+
+Here we find the mean of all probabilities listed and then compare it with the considered threshold probability (p = 0.5).
+mean(0.1, 0.15, 0.2, 0.2, 0.55, 0.6, 0.6, 0.65, 0.7, 0.75) = 0.45
+
+\textbf{\textit{Therefore, as the average probability is less than 0.5, the assigned class here is GREEN}}.
+
+Therefore, the final classification for the both the approaches are different. This may be due to average probability being more sensitive to outliers as the most of the instances
+are closer to 0, despite the majority instances belonging to class red where most of them were not closer to 1.
+
+\end{solution}
+
+\begin{problem}
+
+\end{problem}
+
+\begin{solution}
+
+Let's suppose our data consists of \it{p} input variables and a response variable for each of the \it{N} observations, such that \it{i} = 1, 2,...,\it{N} and \it{x_i = (x_i_1,x_i_2,...,x_i_p)}.
+
+\BlankLine
+
+The model that we want to fit is:
+
+\begin{equation}
+    f(x) = \sum_{m=1}^M c_mI(x \epsilon R_m)
+\end{equation}
+
+Using sum of squares, we can see that the best predictor (\(\hat{c}\)) is the average of response values (\(y_i\)) in each region (R_m):
+
+\begin{equation}
+    \hat{c}_m = ave(y_i|x_i \epsilon R_m)
+\end{equation}
+\BlankLine
+
+We use a greedy approach to find binary partitions at every level of the tree.
+
+\BlankLine
+
+First, we start with the root node. The split is made based on the following criteria:
+
+\begin{equation}
+    R_1(j, s) = {X|X_j \leq s} \;\; and \;\; R_2(j, s) = {X|X_j > s}
+\end{equation}
+\BlankLine
+
+In order to split the features, we must find the best values for the splitting variable j and the split point s, by minimizing the following function:
+
+\begin{equation}
+    min_{j,s}[min_{c1} \sum_{x_i \epsilon R_1(j, s)} (y_i - c_1)^2 + min_{c2} \sum_{x \epsilon R_2(j, s)} (y_i - c_2)^2]
+\end{equation}
+\BlankLine
+
+The predictions obtained in this step (\(c_1, c_2\)) average over each region. These can be obtained by solving the following:
+
+\begin{equation}
+    \hat{c_1} = ave(y_i|x_i ∈ R_1(j, s)) \;\; and \;\; \hat{c_2} = ave(y_i|x_i ∈ R_2(j, s))
+\end{equation}
+\BlankLine
+
+These steps are repeated recursively for each sub-node, where the sample size of the data reduces as we go down the tree, with each sub-tree belonging to only a sub-set of the data.
+
+\BlankLine
+
+This recursive partitioning can be stopped based on a stopping criterion, such as a minimum number of samples per node.
+
+\end{solution}
+
+\begin{problem}
+
+\end{problem}
+
+\begin{solution}
+
+Given that the decision tree is a binary tree (i.e. each split results in 2 sub-nodes) with d features, the number of leaf nodes will be \textbf{2}^\textbf{d}.
+
+If we use a sum of decision stumps to represent the function, we would need \textbf{d} terms.
+
+\end{solution}
+
+\begin{problem}
+
+\end{problem}
+
+\begin{solution}
+
+H(Passed) = -(2/6 log_{2} 2/6 + 4/6 log_{2} 4/6)
+
+H(Passed) = log_{2} 3 - 2/3
+
+H)Passed) = 0.92
+
+\end{solution}
+
+\begin{problem}
+
+\end{problem}
+
+\begin{solution}
+
+H(Passed$|$GPA) = - 1/3 ( 1/2 log_{2} 1/2 + 1/2 log_{2} 1/2) - 1/3 ( 1/2 log_{2} 1/2 + 1/2 log_{2} 1/2) - 1/2 (1 log_{2} 1)
+
+H(Passed$|$GPA) = 0.67
+
+\end{solution}
+
+\newpage
+\begin{thebibliography}{9}
+
+\bibitem[(1...5)]{textbook}
+Hastie, Trevor and Tibshirani, Robert and Friedman, Jerome (2009) \emph{The Elements of Statistical Learning}, Springer, 2nd ed.
+
+\end{thebibliography}
+
+\end{document}
