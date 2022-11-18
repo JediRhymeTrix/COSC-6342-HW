@@ -1,5 +1,6 @@
 {
     "conventionalCommits.scopes": [
-        "theory"
+        "theory",
+        "notebook"
     ]
 }
